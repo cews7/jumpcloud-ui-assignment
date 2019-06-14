@@ -18,8 +18,12 @@ export default class ToDoList extends Component {
       .then(data => this.setState({ items: data }));
   }
 
-  handleCreateToDo(event) {
+  handleCreateToDoClick(event) {
     event.preventDefault();
+    const newItem = { description: '', done: false, id: this.state.items.length + 1 }
+    this.setState({
+      items: [...this.state.items, newItem]
+    })
   }
 
   handleChange = async(item, event) => {
@@ -37,7 +41,7 @@ export default class ToDoList extends Component {
     });
   }
 
-  handleClick = async(item, event) => {
+  handleDoneClick = async(item, event) => {
     event.preventDefault();
     item.done ? item.done = false : item.done = true
 
@@ -63,7 +67,7 @@ export default class ToDoList extends Component {
     }).catch(error => error);
   }
 
-  handleBlur = (item) => {
+  handleSaveBlur = (item) => {
     fetch(API + '/' + item.id, {
       method: 'PUT',
       body: JSON.stringify(item),
@@ -85,14 +89,18 @@ export default class ToDoList extends Component {
             {items.map(item =>
               <div className='form-group mb-2' key={item.id}>
                 <input type='text' className='form-control-plaintext center-list' value={item.description}
-                onChange={this.handleChange.bind(this, item)} onBlur={this.handleBlur.bind(this, item)} />
-                <button type="submit" className="btn btn-primary mb-2" onClick={this.handleClick.bind(this, item)}>
-                  { item.done ? 'Done' : 'Not Done' }
-                </button>
+                onChange={this.handleChange.bind(this, item)} onBlur={this.handleSaveBlur.bind(this, item)} />
+                { item.description !== '' ?
+                  <button type="submit" className="btn btn-primary mb-2" onClick={this.handleDoneClick.bind(this, item)}>
+                    { item.done ? 'Done' : 'Not Done' }
+                  </button> :
+                  <button type="submit" className="btn btn-primary mb-2" onClick={this.handleSaveClick.bind(this, item)}>
+                    Save
+                  </button> }
               </div>
             )}
           </form>
-          <button type="submit" className="btn btn-success" onSubmit={this.handleCreateToDo}>Create To Do</button>
+          <button type="submit" className="btn btn-success" onClick={this.handleCreateToDoClick.bind(this)}>Create To Do</button>
         </div>
       </>
     );
