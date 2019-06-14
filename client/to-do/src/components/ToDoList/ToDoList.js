@@ -33,7 +33,34 @@ export default class ToDoList extends Component {
       if (item.id === this.state.currentItem.id) {
         item.description = this.state.currentItem.description
       }
+      return item
     });
+  }
+
+  handleClick = async(item, event) => {
+    event.preventDefault();
+    item.done ? item.done = false : item.done = true
+
+    await this.setState({
+      currentItem: item
+    });
+
+    this.state.items.map(item => {
+      if (item.id === this.state.currentItem.id) {
+          item.done = this.state.currentItem.done
+        }
+        return item;
+    });
+
+    fetch(API + '/' + item.id, {
+      method: 'PUT',
+      body: JSON.stringify(item),
+      headers: {
+        'Content-Type': 'application/json'
+      }
+    }).then((response) => {
+      return response;
+    }).catch(error => error);
   }
 
   handleBlur = (item) => {
@@ -59,7 +86,7 @@ export default class ToDoList extends Component {
               <div className='form-group mb-2' key={item.id}>
                 <input type='text' className='form-control-plaintext center-list' value={item.description}
                 onChange={this.handleChange.bind(this, item)} onBlur={this.handleBlur.bind(this, item)} />
-                <button type="submit" className="btn btn-primary mb-2" onSubmit={this.handleIsDone}>
+                <button type="submit" className="btn btn-primary mb-2" onClick={this.handleClick.bind(this, item)}>
                   { item.done ? 'Done' : 'Not Done' }
                 </button>
               </div>
