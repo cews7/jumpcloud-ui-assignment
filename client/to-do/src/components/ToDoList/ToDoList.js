@@ -8,7 +8,8 @@ export default class ToDoList extends Component {
     super();
     this.state = {
       items: [],
-      currentItem: {}
+      currentItem: {},
+      isSave: false
     };
   }
 
@@ -16,14 +17,6 @@ export default class ToDoList extends Component {
     fetch(API)
       .then(response => response.json())
       .then(data => this.setState({ items: data }));
-  }
-
-  handleCreateToDoClick(event) {
-    event.preventDefault();
-    const newItem = { description: '', done: false, id: this.state.items.length + 1 }
-    this.setState({
-      items: [...this.state.items, newItem]
-    })
   }
 
   handleChange = async(item, event) => {
@@ -43,6 +36,7 @@ export default class ToDoList extends Component {
 
   handleDoneClick = async(item, event) => {
     event.preventDefault();
+
     item.done ? item.done = false : item.done = true
 
     await this.setState({
@@ -79,6 +73,59 @@ export default class ToDoList extends Component {
     }).catch(error => error);
   }
 
+  handleCreateToDoClick = async(event) => {
+    await this.setState({
+      isSave: true
+    });
+  }
+
+  handleSaveClick = (event) => {
+    fetch(API, {
+      method: 'POST',
+      headers: {
+        'Accept': 'application/json',
+        'Content-Type': 'application/json'
+      },
+      body: JSON.stringify({
+        done: false,
+        description: 'test'
+      })
+    }).then(fetch(API)
+        .then(response => response.json())
+        .then(data => this.setState({ items: data })));
+    this.setState({
+      isSave: false
+    });
+  }
+
+  handleDeleteClick = async(item, event) => {
+    event.preventDefault();
+
+    await this.setState({
+      currentItem: item
+    });
+
+    this.state.items.map(item => {
+      if (item.id === this.state.currentItem.id) {
+        this.state.items.splice(this.state.items.indexOf(item), 1)
+      }
+    });
+
+    this.setState({
+      items: this.state.items
+    });
+
+    fetch(API + '/' + item.id, {
+      method: 'DELETE',
+      body: JSON.stringify(item),
+      headers: {
+        'Content-Type': 'application/json'
+      }
+    }).then((response) => {
+      return response;
+    }).catch(error => error);
+  }
+
   render() {
     const { items } = this.state;
     return (
@@ -90,17 +137,17 @@ export default class ToDoList extends Component {
               <div className='form-group mb-2' key={item.id}>
                 <input type='text' className='form-control-plaintext center-list' value={item.description}
                 onChange={this.handleChange.bind(this, item)} onBlur={this.handleSaveBlur.bind(this, item)} />
-                { item.description !== '' ?
-                  <button type="submit" className="btn btn-primary mb-2" onClick={this.handleDoneClick.bind(this, item)}>
-                    { item.done ? 'Done' : 'Not Done' }
-                  </button> :
-                  <button type="submit" className="btn btn-primary mb-2" onClick={this.handleSaveClick.bind(this, item)}>
-                    Save
-                  </button> }
+                <button type="submit" className="btn btn-primary" onClick={this.handleDoneClick.bind(this, item)}>
+                  { item.done ? 'Done' : 'Not Done' }
+                </button>
+                <button type="button" className="btn btn-danger" onClick={this.handleDeleteClick.bind(this, item)}>Delete</button>
               </div>
             )}
           </form>
-          <button type="submit" className="btn btn-success" onClick={this.handleCreateToDoClick.bind(this)}>Create To Do</button>
+          { this.state.isSave ?
+            <button type="submit" className="btn btn-success" onClick={this.handleSaveClick}>Save</button> :
+            <button type="submit" className="btn btn-success" onClick={this.handleCreateToDoClick}>Create To Do</button>
+          }
         </div>
       </>
     );
