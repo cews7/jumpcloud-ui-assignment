@@ -8,7 +8,8 @@ export default class ToDoList extends Component {
     super();
     this.state = {
       items: [],
-      currentItem: {}
+      currentItem: {},
+      isSave: false
     };
   }
 
@@ -16,10 +17,6 @@ export default class ToDoList extends Component {
     fetch(API)
       .then(response => response.json())
       .then(data => this.setState({ items: data }));
-  }
-
-  handleCreateToDo(event) {
-    event.preventDefault();
   }
 
   handleChange = async(item, event) => {
@@ -33,12 +30,93 @@ export default class ToDoList extends Component {
       if (item.id === this.state.currentItem.id) {
         item.description = this.state.currentItem.description
       }
+      return item
     });
   }
 
-  handleBlur = (item) => {
+  handleDoneClick = async(item, event) => {
+    event.preventDefault();
+
+    item.done ? item.done = false : item.done = true
+
+    await this.setState({
+      currentItem: item
+    });
+
+    this.state.items.map(item => {
+      if (item.id === this.state.currentItem.id) {
+          item.done = this.state.currentItem.done
+        }
+        return item;
+    });
+
     fetch(API + '/' + item.id, {
       method: 'PUT',
+      body: JSON.stringify(item),
+      headers: {
+        'Content-Type': 'application/json'
+      }
+    }).then((response) => {
+      return response;
+    }).catch(error => error);
+  }
+
+  handleSaveBlur = (item) => {
+    fetch(API + '/' + item.id, {
+      method: 'PUT',
+      body: JSON.stringify(item),
+      headers: {
+        'Content-Type': 'application/json'
+      }
+    }).then((response) => {
+      return response;
+    }).catch(error => error);
+  }
+
+  handleCreateToDoClick = async(event) => {
+    await this.setState({
+      isSave: true
+    });
+  }
+
+  handleSaveClick = (event) => {
+    fetch(API, {
+      method: 'POST',
+      headers: {
+        'Accept': 'application/json',
+        'Content-Type': 'application/json'
+      },
+      body: JSON.stringify({
+        done: false,
+        description: 'test'
+      })
+    }).then(fetch(API)
+        .then(response => response.json())
+        .then(data => this.setState({ items: data })));
+    this.setState({
+      isSave: false
+    });
+  }
+
+  handleDeleteClick = async(item, event) => {
+    event.preventDefault();
+
+    await this.setState({
+      currentItem: item
+    });
+
+    this.state.items.map(item => {
+      if (item.id === this.state.currentItem.id) {
+        this.state.items.splice(this.state.items.indexOf(item), 1)
+      }
+    });
+
+    this.setState({
+      items: this.state.items
+    });
+
+    fetch(API + '/' + item.id, {
+      method: 'DELETE',
       body: JSON.stringify(item),
       headers: {
         'Content-Type': 'application/json'
@@ -58,14 +136,18 @@ export default class ToDoList extends Component {
             {items.map(item =>
               <div className='form-group mb-2' key={item.id}>
                 <input type='text' className='form-control-plaintext center-list' value={item.description}
-                onChange={this.handleChange.bind(this, item)} onBlur={this.handleBlur.bind(this, item)} />
-                <button type="submit" className="btn btn-primary mb-2" onSubmit={this.handleIsDone}>
+                onChange={this.handleChange.bind(this, item)} onBlur={this.handleSaveBlur.bind(this, item)} />
+                <button type="submit" className="btn btn-primary" onClick={this.handleDoneClick.bind(this, item)}>
                   { item.done ? 'Done' : 'Not Done' }
                 </button>
+                <button type="button" className="btn btn-danger" onClick={this.handleDeleteClick.bind(this, item)}>Delete</button>
               </div>
             )}
           </form>
-          <button type="submit" className="btn btn-success" onSubmit={this.handleCreateToDo}>Create To Do</button>
+          { this.state.isSave ?
+            <button type="submit" className="btn btn-success" onClick={this.handleSaveClick}>Save</button> :
+            <button type="submit" className="btn btn-success" onClick={this.handleCreateToDoClick}>Create To Do</button>
+          }
         </div>
       </>
     );
