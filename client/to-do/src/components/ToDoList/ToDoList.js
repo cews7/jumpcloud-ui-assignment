@@ -121,6 +121,13 @@ export default class ToDoList extends Component {
     })
   }
 
+  handleEnter = (event) => {
+    let input = document.getElementById('toDoInput');
+    if (event.keyCode === 13) {
+      document.getElementById('saveToDoButton').click();
+    }
+  }
+
   handleDeleteClick = async(item, event) => {
     event.preventDefault();
 
@@ -158,19 +165,19 @@ export default class ToDoList extends Component {
           <form className='form'>
             {items.map(item =>
               <div className='form-group mb-2' key={item.id}>
+                <button type="submit" className="btn btn-primary" onClick={this.handleDoneClick.bind(this, item)}>
+                { item.done ? 'Done' : 'Not Done' }
+                </button>
                 <input type='text' className='form-control-plaintext center-list' value={item.description}
                 onChange={this.handleChange.bind(this, item)} onBlur={this.handleSaveBlur.bind(this, item)} />
-                <button type="submit" className="btn btn-primary" onClick={this.handleDoneClick.bind(this, item)}>
-                  { item.done ? 'Done' : 'Not Done' }
-                </button>
-                <button type="button" className="btn btn-danger" onClick={this.handleDeleteClick.bind(this, item)}>Delete</button>
+                <i className='fas fa-trash' onClick={this.handleDeleteClick.bind(this, item)}></i>
               </div>
             )}
           </form>
           { this.state.isSave ?
             <>
-             <input type='text' autofocus='true' id='toDoInput' placeholder='add to do here' className='form-control-plaintext center-list' onChange={this.updateNewToDo} value={this.state.newToDo.value} />
-             <button type="submit" className="btn btn-success" onClick={this.handleSaveClick}>Save</button>
+             <input type='text' autoComplete='off' autoFocus={true} onKeyDown={this.handleEnter} id='toDoInput' placeholder='add to do here' className='form-control-plaintext center-list' onChange={this.updateNewToDo} value={this.state.newToDo.value} />
+             <button type="submit" id='saveToDoButton' className="btn btn-success" onClick={this.handleSaveClick}>Save</button>
              <button type="submit" className="btn btn-info" onClick={this.handleCancelClick}>Cancel</button>
             </> :
             <button type="submit" className="btn btn-success" onClick={this.handleCreateToDoClick}>Create To Do</button>
