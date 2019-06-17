@@ -1,9 +1,16 @@
-.todo-header {
-  text-align: center;
+body {
+  background: rgba(255,255,240);
 }
 
-.center-list {
+.todo-header {
   text-align: center;
+  font-family: 'Swanky and Moo Moo', cursive;
+  font-size: 76px;
+}
+
+.todo-description-width {
+  text-align: left;
+  width: 750px !important;
 }
 
 .list-group {
@@ -13,4 +20,42 @@
 .form-control-plaintext {
   display: inline;
   width: unset;
+}
+
+.input-and-create-position {
+  margin-left: 10px;
+  margin-right: 10px;
+}
+
+.done-delete-position {
+  margin-right: 10px;
+}
+
+.grey-bg {
+  background-color: rgba(0, 0, 0, 0.1);
+  border-radius: 25px;
+  margin-left: 300px;
+  margin-right: 300px;
+  margin-top: 20px;
+  margin-bottom: 20px;
+  padding: 20px;
+}
+
+.list {
+  align-items: center;
+  flex-direction: column;
+  justify-content: center;
+  font-family: 'Quicksand', sans-serif;
+  line-height: 1.5;
+  font-weight: bold;
+  font-size: 20px;
+}
+
+.save-cancel-bottom {
+  margin-bottom: 20px;
+}
+
+.mb-2:hover {
+  border-radius: 12px;
+  background-color: rgba(249, 255, 102);
 }
