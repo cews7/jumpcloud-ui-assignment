@@ -9,7 +9,8 @@ export default class ToDoList extends Component {
     this.state = {
       items: [],
       currentItem: {},
-      isSave: false
+      isSave: false,
+      newToDo: ''
     };
   }
 
@@ -35,7 +36,6 @@ export default class ToDoList extends Component {
   }
 
   handleDoneClick = async(item, event) => {
-    debugger;
     event.preventDefault();
     if (item.description) {
       item.done ? item.done = false : item.done = true
@@ -63,35 +63,33 @@ export default class ToDoList extends Component {
   }
 
   handleSaveBlur = (item) => {
-    if (item.newItem) {
-      return item;
-    } else {
-      fetch(API + '/' + item.id, {
-        method: 'PUT',
-        body: JSON.stringify(item),
-        headers: {
-          'Content-Type': 'application/json'
-        }
-      }).then((response) => {
-        return response;
-      }).catch(error => error);
-    }
+    fetch(API + '/' + item.id, {
+      method: 'PUT',
+      body: JSON.stringify(item),
+      headers: {
+        'Content-Type': 'application/json'
+      }
+    }).then((response) => {
+      return response;
+    }).catch(error => error);
   }
 
-  handleCreateToDoClick = async(event) => {
+  handleCreateToDoClick = async() => {
     await this.setState({
-      isSave: true
+      isSave: true,
+      newToDo: ''
     });
+    document.getElementById('toDoInput').focus();
+  }
 
-    let newItem = { description: '', done: false, id: new Date().getTime(), newItem: true }
+  updateNewToDo = (event) => {
     this.setState({
-      items: [...this.state.items, newItem]
-    })
+      newToDo: event.target.value
+    });
   }
 
   handleSaveClick = () => {
-    let newItemDescription = this.state.items.slice(-1).pop().description;
-    if (newItemDescription) {
+    if (this.state.newToDo) {
       fetch(API, {
         method: 'POST',
         headers: {
@@ -99,14 +97,34 @@ export default class ToDoList extends Component {
           'Content-Type': 'application/json'
         },
         body: JSON.stringify({
-          description: newItemDescription
+          description: this.state.newToDo
         })
-      }).then(response => response.json());
+      }).then(response => response.json())
+        .then(data => this.addData(data));
       this.setState({
         isSave: false
       });
     } else {
       alert('Cannot Save an empty To Do!')
+    }
+  }
+
+  addData = (item) => {
+    let items = this.state.items
+    items.push(item)
+    this.setState({ items: items })
+  }
+
+  handleCancelClick = () => {
+    this.setState({
+      isSave: false
+    })
+  }
+
+  handleEnter = (event) => {
+    let input = document.getElementById('toDoInput');
+    if (event.keyCode === 13) {
+      document.getElementById('saveToDoButton').click();
     }
   }
 
@@ -139,7 +157,7 @@ export default class ToDoList extends Component {
   }
 
   render() {
-    const { items } = this.state;
+    const { items, newToDo } = this.state;
     return (
       <>
         <h2 className='todo-header'>To Dos This Week</h2>
@@ -147,17 +165,21 @@ export default class ToDoList extends Component {
           <form className='form'>
             {items.map(item =>
               <div className='form-group mb-2' key={item.id}>
+                <button type="submit" className="btn btn-primary" onClick={this.handleDoneClick.bind(this, item)}>
+                { item.done ? 'Done' : 'Not Done' }
+                </button>
                 <input type='text' className='form-control-plaintext center-list' value={item.description}
                 onChange={this.handleChange.bind(this, item)} onBlur={this.handleSaveBlur.bind(this, item)} />
-                <button type="submit" className="btn btn-primary" onClick={this.handleDoneClick.bind(this, item)}>
-                  { item.done ? 'Done' : 'Not Done' }
-                </button>
-                <button type="button" className="btn btn-danger" onClick={this.handleDeleteClick.bind(this, item)}>Delete</button>
+                <i className='fas fa-trash' onClick={this.handleDeleteClick.bind(this, item)}></i>
               </div>
             )}
           </form>
           { this.state.isSave ?
-            <button type="submit" className="btn btn-success" onClick={this.handleSaveClick}>Save</button> :
+            <>
+             <input type='text' autoComplete='off' autoFocus={true} onKeyDown={this.handleEnter} id='toDoInput' placeholder='add to do here' className='form-control-plaintext center-list' onChange={this.updateNewToDo} value={this.state.newToDo.value} />
+             <button type="submit" id='saveToDoButton' className="btn btn-success" onClick={this.handleSaveClick}>Save</button>
+             <button type="submit" className="btn btn-info" onClick={this.handleCancelClick}>Cancel</button>
+            </> :
             <button type="submit" className="btn btn-success" onClick={this.handleCreateToDoClick}>Create To Do</button>
           }
         </div>
