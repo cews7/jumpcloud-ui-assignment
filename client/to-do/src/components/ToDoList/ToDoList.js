@@ -74,8 +74,8 @@ export default class ToDoList extends Component {
     }).catch(error => error);
   }
 
-  handleCreateToDoClick = async(event) => {
-    await this.setState({
+  handleCreateToDoClick = (event) => {
+    this.setState({
       isSave: true,
       newToDo: ''
     });
@@ -112,6 +112,12 @@ export default class ToDoList extends Component {
     let items = this.state.items
     items.push(item)
     this.setState({ items: items })
+  }
+
+  handleCancelClick = () => {
+    this.setState({
+      isSave: false
+    })
   }
 
   handleDeleteClick = async(item, event) => {
@@ -164,6 +170,7 @@ export default class ToDoList extends Component {
             <>
              <input type='text' className='form-control-plaintext center-list' onChange={this.updateNewToDo} value={this.state.newToDo.value} />
              <button type="submit" className="btn btn-success" onClick={this.handleSaveClick}>Save</button>
+             <button type="submit" className="btn btn-info" onClick={this.handleCancelClick}>Cancel</button>
             </> :
             <button type="submit" className="btn btn-success" onClick={this.handleCreateToDoClick}>Create To Do</button>
           }
