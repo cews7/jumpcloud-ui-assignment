@@ -76,13 +76,9 @@ export default class ToDoList extends Component {
 
   handleCreateToDoClick = async(event) => {
     await this.setState({
-      isSave: true
+      isSave: true,
+      newToDo: ''
     });
-
-    let newToDo = { description: '' }
-    this.setState({
-      newToDo: newToDo
-    })
   }
 
   updateNewToDo = (event) => {
@@ -92,7 +88,7 @@ export default class ToDoList extends Component {
   }
 
   handleSaveClick = () => {
-    if (this.state.newToDo.value) {
+    if (this.state.newToDo) {
       fetch(API, {
         method: 'POST',
         headers: {
