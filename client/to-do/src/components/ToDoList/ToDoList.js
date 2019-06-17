@@ -122,7 +122,6 @@ export default class ToDoList extends Component {
   }
 
   handleEnter = (event) => {
-    let input = document.getElementById('toDoInput');
     if (event.keyCode === 13) {
       document.getElementById('saveToDoButton').click();
     }
@@ -139,6 +138,7 @@ export default class ToDoList extends Component {
       if (item.id === this.state.currentItem.id) {
         this.state.items.splice(this.state.items.indexOf(item), 1)
       }
+      return item;
     });
 
     this.setState({
@@ -157,7 +157,7 @@ export default class ToDoList extends Component {
   }
 
   render() {
-    const { items, newToDo } = this.state;
+    const { items } = this.state;
     return (
       <>
         <h2 className='todo-header'>To Dos This Week</h2>
