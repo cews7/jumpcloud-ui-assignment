@@ -35,72 +35,79 @@ export default class ToDoList extends Component {
   }
 
   handleDoneClick = async(item, event) => {
+    debugger;
     event.preventDefault();
-
-    item.done ? item.done = false : item.done = true
-
-    await this.setState({
-      currentItem: item
-    });
-
-    this.state.items.map(item => {
-      if (item.id === this.state.currentItem.id) {
+    if (item.description) {
+      item.done ? item.done = false : item.done = true
+      await this.setState({
+        currentItem: item
+      });
+      this.state.items.map(item => {
+        if (item.id === this.state.currentItem.id) {
           item.done = this.state.currentItem.done
         }
         return item;
-    });
-
-    fetch(API + '/' + item.id, {
-      method: 'PUT',
-      body: JSON.stringify(item),
-      headers: {
-        'Content-Type': 'application/json'
-      }
-    }).then((response) => {
-      return response;
-    }).catch(error => error);
+      });
+      fetch(API + '/' + item.id, {
+        method: 'PUT',
+        body: JSON.stringify(item),
+        headers: {
+          'Content-Type': 'application/json'
+        }
+      }).then((response) => {
+        return response;
+      }).catch(error => error);
+    } else {
+      alert('Cannot mark as done or not done without description!')
+    }
   }
 
   handleSaveBlur = (item) => {
-    fetch(API + '/' + item.id, {
-      method: 'PUT',
-      body: JSON.stringify(item),
-      headers: {
-        'Content-Type': 'application/json'
-      }
-    }).then((response) => {
-      return response;
-    }).catch(error => error);
+    if (item.newItem) {
+      return item;
+    } else {
+      fetch(API + '/' + item.id, {
+        method: 'PUT',
+        body: JSON.stringify(item),
+        headers: {
+          'Content-Type': 'application/json'
+        }
+      }).then((response) => {
+        return response;
+      }).catch(error => error);
+    }
   }
 
   handleCreateToDoClick = async(event) => {
     await this.setState({
       isSave: true
     });
-  }
 
-  handleSaveClick = (event) => {
-    fetch(API, {
-      method: 'POST',
-      headers: {
-        'Accept': 'application/json',
-        'Content-Type': 'application/json'
-      },
-      body: JSON.stringify({
-        done: false,
-        description: 'test'
-      })
-    }).then(response => response.json())
-      .then(data => this.addItem(data));
+    let newItem = { description: '', done: false, id: new Date().getTime(), newItem: true }
     this.setState({
-      isSave: false
-    });
+      items: [...this.state.items, newItem]
+    })
   }
 
-  addItem = (item) => {
-    let items = this.state.items
-    items.push(item)
-    this.setState({items: items})
+  handleSaveClick = () => {
+    let newItemDescription = this.state.items.slice(-1).pop().description;
+    if (newItemDescription) {
+      fetch(API, {
+        method: 'POST',
+        headers: {
+          'Accept': 'application/json',
+          'Content-Type': 'application/json'
+        },
+        body: JSON.stringify({
+          description: newItemDescription
+        })
+      }).then(response => response.json());
+      this.setState({
+        isSave: false
+      });
+    } else {
+      alert('Cannot Save an empty To Do!')
+    }
   }
 
   handleDeleteClick = async(item, event) => {
