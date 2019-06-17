@@ -13,10 +13,6 @@ body {
   width: 750px !important;
 }
 
-.list-group {
-  margin-bottom: 20px;
-}
-
 .form-control-plaintext {
   display: inline;
   width: unset;
