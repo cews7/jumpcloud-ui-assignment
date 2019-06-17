@@ -90,12 +90,17 @@ export default class ToDoList extends Component {
         done: false,
         description: 'test'
       })
-    }).then(fetch(API)
-        .then(response => response.json())
-        .then(data => this.setState({ items: data })));
+    }).then(response => response.json())
+      .then(data => this.addItem(data));
     this.setState({
       isSave: false
     });
+  }
+
+  addItem = (item) => {
+    let items = this.state.items
+    items.push(item)
+    this.setState({items: items})
   }
 
   handleDeleteClick = async(item, event) => {

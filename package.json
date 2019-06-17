@@ -12,7 +12,7 @@
     "url": "https://github.com/TheJumpCloud/jumpcloud-ui-assignment/issues"
   },
   "scripts": {
-    "start:client": "webpack-dev-server --progress --inline",
+    "start:client": "cd client && cd to-do && npm start",
     "start:server": "node server/server.js"
   },
   "dependencies": {
