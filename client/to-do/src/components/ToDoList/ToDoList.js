@@ -74,11 +74,12 @@ export default class ToDoList extends Component {
     }).catch(error => error);
   }
 
-  handleCreateToDoClick = (event) => {
-    this.setState({
+  handleCreateToDoClick = async() => {
+    await this.setState({
       isSave: true,
       newToDo: ''
     });
+    document.getElementById('toDoInput').focus();
   }
 
   updateNewToDo = (event) => {
@@ -168,7 +169,7 @@ export default class ToDoList extends Component {
           </form>
           { this.state.isSave ?
             <>
-             <input type='text' className='form-control-plaintext center-list' onChange={this.updateNewToDo} value={this.state.newToDo.value} />
+             <input type='text' autofocus='true' id='toDoInput' placeholder='add to do here' className='form-control-plaintext center-list' onChange={this.updateNewToDo} value={this.state.newToDo.value} />
              <button type="submit" className="btn btn-success" onClick={this.handleSaveClick}>Save</button>
              <button type="submit" className="btn btn-info" onClick={this.handleCancelClick}>Cancel</button>
             </> :
