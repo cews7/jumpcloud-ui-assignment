@@ -40,9 +40,9 @@ following:
   $ npm run start:server
   ```
 3. **Install dependencies for React:**
-```
+  ```
   $ cd client/to-do && npm install && cd -
-```
+  ```
 
 4. Run the client:
   ```
