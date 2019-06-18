@@ -12,6 +12,7 @@
     "url": "https://github.com/TheJumpCloud/jumpcloud-ui-assignment/issues"
   },
   "scripts": {
+    "install": "npm install && cd client && cd to-do && npm install && cd .. && cd ..",
     "start:client": "cd client && cd to-do && npm start",
     "start:server": "node server/server.js"
   },
