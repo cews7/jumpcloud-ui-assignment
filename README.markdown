@@ -39,17 +39,17 @@ following:
   ```
   $ npm run start:server
   ```
-3. Install dependencies for React:
+3. **Install dependencies for React:**
 ```
   $ cd client/to-do && npm install && cd -
 ```
 
-3. Run the client:
+4. Run the client:
   ```
   $ npm run start:client
   ```
 
-4. Point browser to:
+5. Point browser to:
   ```
   http://localhost:8005/
   ```
