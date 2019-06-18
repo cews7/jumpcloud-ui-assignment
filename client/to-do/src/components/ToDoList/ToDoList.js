@@ -20,6 +20,26 @@ export default class ToDoList extends Component {
       .then(data => this.setState({ items: data }));
   }
 
+  handleSaveClick = () => {
+    if (this.state.newToDo) {
+      fetch(API, {
+        method: 'POST',
+        headers: {
+          'Accept': 'application/json',
+          'Content-Type': 'application/json'
+        },
+        body: JSON.stringify({
+          description: this.state.newToDo
+        })
+      }).then(response => response.json())
+        .then(data => this.addData(data));
+
+      this.setState({ isSave: false });
+    } else {
+      alert('Cannot save an empty To-Do!')
+    }
+  }
+
   handleChange = async(item, event) => {
     item.description = event.target.value;
 
@@ -33,17 +53,8 @@ export default class ToDoList extends Component {
     });
   }
 
-  handleDoneClick = async(item) => {
+  handleDoneClick = (item) => {
       item.done ? item.done = false : item.done = true
-
-      await this.setState({ currentItem: item });
-
-      this.state.items.map(item => {
-        if (item.id === this.state.currentItem.id) {
-          item.done = this.state.currentItem.done;
-        }
-        return item;
-      });
 
       fetch(API + '/' + item.id, {
         method: 'PUT',
@@ -77,36 +88,28 @@ export default class ToDoList extends Component {
     }
   }
 
+  deleteToDo = (item) => {
+    this.state.items.splice(this.state.items.indexOf(item), 1)
+
+    this.setState({ items: this.state.items });
+
+    fetch(API + '/' + item.id, {
+      method: 'DELETE',
+      body: JSON.stringify(item),
+      headers: {
+        'Content-Type': 'application/json'
+      }
+    }).then((response) => {
+      return response;
+    }).catch(error => error);
+  }
+
   handleCreateToDoClick = async() => {
     await this.setState({
       isSave: true,
       newToDo: ''
     });
     document.getElementById('toDoInput').focus();
-  }
-
-  updateNewToDo = (event) => {
-    this.setState({ newToDo: event.target.value });
-  }
-
-  handleSaveClick = () => {
-    if (this.state.newToDo) {
-      fetch(API, {
-        method: 'POST',
-        headers: {
-          'Accept': 'application/json',
-          'Content-Type': 'application/json'
-        },
-        body: JSON.stringify({
-          description: this.state.newToDo
-        })
-      }).then(response => response.json())
-        .then(data => this.addData(data));
-
-      this.setState({ isSave: false });
-    } else {
-      alert('Cannot save an empty To-Do!')
-    }
   }
 
   handleCancelClick = () => {
@@ -120,32 +123,11 @@ export default class ToDoList extends Component {
   }
 
   addData = (item) => {
-    let items = this.state.items;
-    items.push(item)
-    this.setState({ items: items });
+    this.setState({ items: [...this.state.items, item] });
   }
 
-  deleteToDo = async(item) => {
-    await this.setState({ currentItem: item });
-
-    this.state.items.map(item => {
-      if (item.id === this.state.currentItem.id) {
-        this.state.items.splice(this.state.items.indexOf(item), 1)
-      }
-      return item;
-    });
-
-    this.setState({ items: this.state.items });
-
-    fetch(API + '/' + item.id, {
-      method: 'DELETE',
-      body: JSON.stringify(item),
-      headers: {
-        'Content-Type': 'application/json'
-      }
-    }).then((response) => {
-      return response;
-    }).catch(error => error);
+  updateNewToDo = (event) => {
+    this.setState({ newToDo: event.target.value });
   }
 
   render() {
