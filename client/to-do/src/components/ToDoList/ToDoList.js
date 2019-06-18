@@ -21,32 +21,30 @@ export default class ToDoList extends Component {
   }
 
   handleChange = async(item, event) => {
-    item.description = event.target.value
+    item.description = event.target.value;
 
-    await this.setState({
-      currentItem: item
-    });
+    await this.setState({ currentItem: item });
 
     this.state.items.map(item => {
       if (item.id === this.state.currentItem.id) {
         item.description = this.state.currentItem.description
       }
-      return item
+      return item;
     });
   }
 
   handleDoneClick = async(item) => {
-    if (item.description) {
       item.done ? item.done = false : item.done = true
-      await this.setState({
-        currentItem: item
-      });
+
+      await this.setState({ currentItem: item });
+
       this.state.items.map(item => {
         if (item.id === this.state.currentItem.id) {
-          item.done = this.state.currentItem.done
+          item.done = this.state.currentItem.done;
         }
         return item;
       });
+
       fetch(API + '/' + item.id, {
         method: 'PUT',
         body: JSON.stringify(item),
@@ -56,9 +54,6 @@ export default class ToDoList extends Component {
       }).then((response) => {
         return response;
       }).catch(error => error);
-    } else {
-      alert('Cannot mark as done or not done without description!')
-    }
   }
 
   handleSaveBlur = async(item) => {
@@ -185,9 +180,9 @@ export default class ToDoList extends Component {
   render() {
     const { items } = this.state;
     return (
-      <>
+      <div>
         <h2 className='todo-header'>To-Dos This Week</h2>
-        <div className='center-list grey-bg list'>
+        <div className='center-list grey-bg todo-list'>
           <form className='form'>
             {items.map(item =>
               <div className='mb-2' key={item.id}>
@@ -208,7 +203,7 @@ export default class ToDoList extends Component {
             <button type="submit" className="btn btn-success" onClick={this.handleCreateToDoClick}>Create To Do</button>
           }
         </div>
-      </>
+      </div>
     );
   }
 }
