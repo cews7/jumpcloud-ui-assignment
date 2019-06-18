@@ -27,7 +27,7 @@ export default class ToDoList extends Component {
 
     this.state.items.map(item => {
       if (item.id === this.state.currentItem.id) {
-        item.description = this.state.currentItem.description
+        item.description = this.state.currentItem.description;
       }
       return item;
     });
@@ -61,7 +61,7 @@ export default class ToDoList extends Component {
     this.deleteToDo(item);
   }
 
-  handleUpdateBlur = async(item) => {
+  handleUpdateBlur = (item) => {
     if (item.description) {
       fetch(API + '/' + item.id, {
         method: 'PUT',
@@ -86,9 +86,7 @@ export default class ToDoList extends Component {
   }
 
   updateNewToDo = (event) => {
-    this.setState({
-      newToDo: event.target.value
-    });
+    this.setState({ newToDo: event.target.value });
   }
 
   handleSaveClick = () => {
@@ -104,24 +102,15 @@ export default class ToDoList extends Component {
         })
       }).then(response => response.json())
         .then(data => this.addData(data));
-      this.setState({
-        isSave: false
-      });
+
+      this.setState({ isSave: false });
     } else {
       alert('Cannot save an empty To-Do!')
     }
   }
 
-  addData = (item) => {
-    let items = this.state.items
-    items.push(item)
-    this.setState({ items: items })
-  }
-
   handleCancelClick = () => {
-    this.setState({
-      isSave: false
-    })
+    this.setState({ isSave: false });
   }
 
   handleEnter = (event) => {
@@ -130,10 +119,14 @@ export default class ToDoList extends Component {
     }
   }
 
+  addData = (item) => {
+    let items = this.state.items;
+    items.push(item)
+    this.setState({ items: items });
+  }
+
   deleteToDo = async(item) => {
-    await this.setState({
-      currentItem: item
-    });
+    await this.setState({ currentItem: item });
 
     this.state.items.map(item => {
       if (item.id === this.state.currentItem.id) {
@@ -142,9 +135,7 @@ export default class ToDoList extends Component {
       return item;
     });
 
-    this.setState({
-      items: this.state.items
-    });
+    this.setState({ items: this.state.items });
 
     fetch(API + '/' + item.id, {
       method: 'DELETE',
