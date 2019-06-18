@@ -7,9 +7,9 @@ import ToDoList from '../ToDoList/ToDoList';
 class App extends Component {
   render() {
     return (
-      <>
+      <div>
         <Route exact path='/' render={(props) => <ToDoList />} />
-      </>
+      </div>
     );
   }
 }

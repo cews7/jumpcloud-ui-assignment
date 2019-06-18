@@ -20,95 +20,6 @@ export default class ToDoList extends Component {
       .then(data => this.setState({ items: data }));
   }
 
-  handleChange = async(item, event) => {
-    item.description = event.target.value;
-
-    await this.setState({ currentItem: item });
-
-    this.state.items.map(item => {
-      if (item.id === this.state.currentItem.id) {
-        item.description = this.state.currentItem.description
-      }
-      return item;
-    });
-  }
-
-  handleDoneClick = async(item) => {
-      item.done ? item.done = false : item.done = true
-
-      await this.setState({ currentItem: item });
-
-      this.state.items.map(item => {
-        if (item.id === this.state.currentItem.id) {
-          item.done = this.state.currentItem.done;
-        }
-        return item;
-      });
-
-      fetch(API + '/' + item.id, {
-        method: 'PUT',
-        body: JSON.stringify(item),
-        headers: {
-          'Content-Type': 'application/json'
-        }
-      }).then((response) => {
-        return response;
-      }).catch(error => error);
-  }
-
-  handleSaveBlur = async(item) => {
-    if (item.description) {
-      fetch(API + '/' + item.id, {
-        method: 'PUT',
-        body: JSON.stringify(item),
-        headers: {
-          'Content-Type': 'application/json'
-        }
-      }).then((response) => {
-        return response;
-      }).catch(error => error);
-    } else {
-      await this.setState({
-        currentItem: item
-      });
-
-      this.state.items.map(item => {
-        if (item.id === this.state.currentItem.id) {
-          this.state.items.splice(this.state.items.indexOf(item), 1)
-        }
-        return item;
-      });
-
-      this.setState({
-        items: this.state.items
-      });
-
-      fetch(API + '/' + item.id, {
-        method: 'DELETE',
-        body: JSON.stringify(item),
-        headers: {
-          'Content-Type': 'application/json'
-        }
-      }).then((response) => {
-        return response;
-      }).catch(error => error);
-    }
-  }
-
-  handleCreateToDoClick = async() => {
-    await this.setState({
-      isSave: true,
-      newToDo: ''
-    });
-    document.getElementById('toDoInput').focus();
-  }
-
-  updateNewToDo = (event) => {
-    this.setState({
-      newToDo: event.target.value
-    });
-  }
-
   handleSaveClick = () => {
     if (this.state.newToDo) {
       fetch(API, {
@@ -122,49 +33,65 @@ export default class ToDoList extends Component {
         })
       }).then(response => response.json())
         .then(data => this.addData(data));
-      this.setState({
-        isSave: false
-      });
+
+      this.setState({ isSave: false });
     } else {
       alert('Cannot save an empty To-Do!')
     }
   }
 
-  addData = (item) => {
-    let items = this.state.items
-    items.push(item)
-    this.setState({ items: items })
+  handleChange = async(item, event) => {
+    item.description = event.target.value;
+
+    await this.setState({ currentItem: item });
+
+    this.state.items.map(item => {
+      if (item.id === this.state.currentItem.id) {
+        item.description = this.state.currentItem.description;
+      }
+      return item;
+    });
   }
 
-  handleCancelClick = () => {
-    this.setState({
-      isSave: false
-    })
-  }
+  handleDoneClick = (item) => {
+      item.done ? item.done = false : item.done = true
 
-  handleEnter = (event) => {
-    if (event.keyCode === 13) {
-      document.getElementById('saveToDoButton').click();
-    }
+      fetch(API + '/' + item.id, {
+        method: 'PUT',
+        body: JSON.stringify(item),
+        headers: {
+          'Content-Type': 'application/json'
+        }
+      }).then((response) => {
+        return response;
+      }).catch(error => error);
   }
 
   handleDeleteClick = async(item, event) => {
     event.preventDefault();
+    this.deleteToDo(item);
+  }
 
-    await this.setState({
-      currentItem: item
-    });
+  handleUpdateBlur = (item) => {
+    if (item.description) {
+      fetch(API + '/' + item.id, {
+        method: 'PUT',
+        body: JSON.stringify(item),
+        headers: {
+          'Content-Type': 'application/json'
+        }
+      }).then((response) => {
+        return response;
+      }).catch(error => error);
+    } else {
+      this.deleteToDo(item);
+    }
+  }
 
-    this.state.items.map(item => {
-      if (item.id === this.state.currentItem.id) {
-        this.state.items.splice(this.state.items.indexOf(item), 1)
-      }
-      return item;
-    });
+  deleteToDo = (item) => {
+    this.state.items.splice(this.state.items.indexOf(item), 1)
 
-    this.setState({
-      items: this.state.items
-    });
+    this.setState({ items: this.state.items });
 
     fetch(API + '/' + item.id, {
       method: 'DELETE',
@@ -175,6 +102,32 @@ export default class ToDoList extends Component {
     }).then((response) => {
       return response;
     }).catch(error => error);
+  }
+
+  handleCreateToDoClick = async() => {
+    await this.setState({
+      isSave: true,
+      newToDo: ''
+    });
+    document.getElementById('toDoInput').focus();
+  }
+
+  handleCancelClick = () => {
+    this.setState({ isSave: false });
+  }
+
+  handleEnter = (event) => {
+    if (event.keyCode === 13) {
+      document.getElementById('saveToDoButton').click();
+    }
+  }
+
+  addData = (item) => {
+    this.setState({ items: [...this.state.items, item] });
+  }
+
+  updateNewToDo = (event) => {
+    this.setState({ newToDo: event.target.value });
   }
 
   render() {
@@ -188,7 +141,7 @@ export default class ToDoList extends Component {
               <div className='mb-2' key={item.id}>
                 <input type="checkbox" defaultChecked={item.done} className="done-delete-position" onClick={this.handleDoneClick.bind(this, item)} />
                 <input type='text' className='form-control-plaintext todo-description-width' value={item.description}
-                onChange={this.handleChange.bind(this, item)} onBlur={this.handleSaveBlur.bind(this, item)} />
+                onChange={this.handleChange.bind(this, item)} onBlur={this.handleUpdateBlur.bind(this, item)} />
                 <i className='fas fa-trash' onClick={this.handleDeleteClick.bind(this, item)}></i>
               </div>
             )}
