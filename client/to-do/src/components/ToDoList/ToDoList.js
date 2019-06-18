@@ -56,7 +56,12 @@ export default class ToDoList extends Component {
       }).catch(error => error);
   }
 
-  handleSaveBlur = async(item) => {
+  handleDeleteClick = async(item, event) => {
+    event.preventDefault();
+    this.deleteToDo(item);
+  }
+
+  handleUpdateBlur = async(item) => {
     if (item.description) {
       fetch(API + '/' + item.id, {
         method: 'PUT',
@@ -68,30 +73,7 @@ export default class ToDoList extends Component {
         return response;
       }).catch(error => error);
     } else {
-      await this.setState({
-        currentItem: item
-      });
-
-      this.state.items.map(item => {
-        if (item.id === this.state.currentItem.id) {
-          this.state.items.splice(this.state.items.indexOf(item), 1)
-        }
-        return item;
-      });
-
-      this.setState({
-        items: this.state.items
-      });
-
-      fetch(API + '/' + item.id, {
-        method: 'DELETE',
-        body: JSON.stringify(item),
-        headers: {
-          'Content-Type': 'application/json'
-        }
-      }).then((response) => {
-        return response;
-      }).catch(error => error);
+      this.deleteToDo(item);
     }
   }
 
@@ -148,9 +130,7 @@ export default class ToDoList extends Component {
     }
   }
 
-  handleDeleteClick = async(item, event) => {
-    event.preventDefault();
-
+  deleteToDo = async(item) => {
     await this.setState({
       currentItem: item
     });
@@ -188,7 +168,7 @@ export default class ToDoList extends Component {
               <div className='mb-2' key={item.id}>
                 <input type="checkbox" defaultChecked={item.done} className="done-delete-position" onClick={this.handleDoneClick.bind(this, item)} />
                 <input type='text' className='form-control-plaintext todo-description-width' value={item.description}
-                onChange={this.handleChange.bind(this, item)} onBlur={this.handleSaveBlur.bind(this, item)} />
+                onChange={this.handleChange.bind(this, item)} onBlur={this.handleUpdateBlur.bind(this, item)} />
                 <i className='fas fa-trash' onClick={this.handleDeleteClick.bind(this, item)}></i>
               </div>
             )}
